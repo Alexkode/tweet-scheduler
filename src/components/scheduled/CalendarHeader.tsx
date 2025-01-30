@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChevronLeft, ChevronRight, Filter } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
@@ -69,9 +69,6 @@ const CalendarHeader = ({
         </span>
         <Button variant="outline" size="icon" onClick={onNext}>
           <ChevronRight className="h-4 w-4" />
-        </Button>
-        <Button variant="outline" size="icon">
-          <Filter className="h-4 w-4" />
         </Button>
       </div>
     </div>
