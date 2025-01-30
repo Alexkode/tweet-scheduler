@@ -1,4 +1,4 @@
-import { Calendar, Home, Plus, Clock, Users } from "lucide-react";
+import { Calendar, Home, Plus, Clock, Users, Settings, Sun, Moon } from "lucide-react";
 import {
   Sidebar as SidebarComponent,
   SidebarContent,
@@ -8,18 +8,23 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { useTheme } from "@/hooks/use-theme";
 
 const menuItems = [
   { title: "Dashboard", icon: Home, path: "/" },
   { title: "New Post", icon: Plus, path: "/new-post" },
   { title: "Scheduled", icon: Clock, path: "/scheduled" },
   { title: "Accounts", icon: Users, path: "/accounts" },
+  { title: "Settings", icon: Settings, path: "/settings" },
 ];
 
 const Sidebar = () => {
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
 
   return (
     <SidebarComponent>
@@ -42,6 +47,15 @@ const Sidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter className="p-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        >
+          {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+        </Button>
+      </SidebarFooter>
     </SidebarComponent>
   );
 };
