@@ -17,7 +17,8 @@ interface MediaInfo {
 
 interface Post {
   content?: string;
-  mediaInfo?: MediaInfo[];
+  imageInfo?: MediaInfo[];
+  videoInfo?: MediaInfo[];
 }
 
 const AutoScheduleForm = () => {
@@ -43,20 +44,30 @@ const AutoScheduleForm = () => {
           const posts = text.split('\n')
             .filter(line => line.trim())
             .map(line => {
-              const [content, mediaInfoStr] = line.split(',').map(str => str?.trim());
-              let mediaInfo: MediaInfo[] = [];
+              const [content, imageInfoStr, videoInfoStr] = line.split(',').map(str => str?.trim());
+              let imageInfo: MediaInfo[] = [];
+              let videoInfo: MediaInfo[] = [];
               
-              if (mediaInfoStr) {
+              if (imageInfoStr) {
                 try {
-                  mediaInfo = JSON.parse(mediaInfoStr);
+                  imageInfo = JSON.parse(imageInfoStr);
                 } catch (e) {
-                  console.error("Error parsing media info:", e);
+                  console.error("Error parsing image info:", e);
+                }
+              }
+
+              if (videoInfoStr) {
+                try {
+                  videoInfo = JSON.parse(videoInfoStr);
+                } catch (e) {
+                  console.error("Error parsing video info:", e);
                 }
               }
 
               return { 
                 content: content || undefined,
-                mediaInfo: mediaInfo.length > 0 ? mediaInfo : undefined
+                imageInfo: imageInfo.length > 0 ? imageInfo : undefined,
+                videoInfo: videoInfo.length > 0 ? videoInfo : undefined
               };
             });
           setImportedPosts(posts);
@@ -238,8 +249,8 @@ const AutoScheduleForm = () => {
             <p className="text-sm text-muted-foreground">
               Format attendu : CSV avec trois colonnes :<br />
               Colonne 1 : Texte du tweet (optionnel)<br />
-              Colonne 2 : Information de l'image (JSON, optionnel)<br />
-              Colonne 3 : Information de la vidéo (JSON, optionnel)<br />
+              Colonne 2 : Information des images (JSON, optionnel)<br />
+              Colonne 3 : Information des vidéos (JSON, optionnel)<br />
               <pre className="mt-2 p-2 bg-muted rounded-md overflow-x-auto">
                 Mon super tweet,[{'"media_url":"https://example.com/image.jpg","downloaded_filepath":"/path/to/local/image.jpg"'}],[{'"media_url":"https://example.com/video.mp4","downloaded_filepath":"/path/to/local/video.mp4"'}]
               </pre>
