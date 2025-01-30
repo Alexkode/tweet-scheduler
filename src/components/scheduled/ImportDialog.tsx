@@ -2,6 +2,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { toast } from "sonner";
+import { useState } from "react";
 
 interface ImportDialogProps {
   open: boolean;
@@ -11,7 +13,35 @@ interface ImportDialogProps {
 }
 
 const ImportDialog = ({ open, onOpenChange, onFileUpload, onSchedule }: ImportDialogProps) => {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  
   const exampleCSV = `Mon super tweet,[{"media_url":"https://example.com/image.jpg","downloaded_filepath":"/path/to/local/image.jpg"}],[{"media_url":"https://example.com/video.mp4","downloaded_filepath":"/path/to/local/video.mp4"}]`;
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (!file.name.endsWith('.csv') && !file.name.endsWith('.txt')) {
+        toast.error("Le fichier doit être au format CSV ou TXT");
+        return;
+      }
+      setSelectedFile(file);
+    }
+  };
+
+  const handleImport = () => {
+    if (!selectedFile) {
+      toast.error("Veuillez sélectionner un fichier");
+      return;
+    }
+
+    try {
+      onFileUpload({ target: { files: [selectedFile] } } as React.ChangeEvent<HTMLInputElement>);
+      onSchedule();
+    } catch (error) {
+      toast.error("Erreur lors de l'importation du fichier");
+      console.error("Import error:", error);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -28,7 +58,7 @@ const ImportDialog = ({ open, onOpenChange, onFileUpload, onSchedule }: ImportDi
               <li>Colonne 3 : Information des vidéos (JSON, optionnel)</li>
             </ul>
             <ScrollArea className="h-24 w-full rounded-md border mt-2">
-              <pre className="p-4 text-xs">
+              <pre className="p-4 text-xs whitespace-pre-wrap break-all">
                 {exampleCSV}
               </pre>
             </ScrollArea>
@@ -36,10 +66,13 @@ const ImportDialog = ({ open, onOpenChange, onFileUpload, onSchedule }: ImportDi
           <Input 
             type="file" 
             accept=".csv,.txt" 
-            onChange={onFileUpload}
+            onChange={handleFileSelect}
           />
           <div className="flex justify-end space-x-2">
-            <Button onClick={onSchedule}>
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
+              Annuler
+            </Button>
+            <Button onClick={handleImport} disabled={!selectedFile}>
               Importer et programmer
             </Button>
           </div>
