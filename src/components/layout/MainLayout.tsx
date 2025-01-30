@@ -1,11 +1,7 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import Sidebar from "./Sidebar";
 
-interface MainLayoutProps {
-  children: React.ReactNode;
-}
-
-const MainLayout = ({ children }: MainLayoutProps) => {
+const MainLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-secondary">
