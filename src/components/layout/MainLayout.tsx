@@ -10,7 +10,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-secondary">
         <Sidebar />
-        <main className="flex-1 p-6 ml-[240px]">{children}</main>
+        <main className="flex-1 p-6">{children}</main>
       </div>
     </SidebarProvider>
   );
