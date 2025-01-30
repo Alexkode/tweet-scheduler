@@ -11,6 +11,8 @@ interface ImportDialogProps {
 }
 
 const ImportDialog = ({ open, onOpenChange, onFileUpload, onSchedule }: ImportDialogProps) => {
+  const exampleCSV = `Mon super tweet,[{"media_url":"https://example.com/image.jpg","downloaded_filepath":"/path/to/local/image.jpg"}],[{"media_url":"https://example.com/video.mp4","downloaded_filepath":"/path/to/local/video.mp4"}]`;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl">
@@ -27,7 +29,7 @@ const ImportDialog = ({ open, onOpenChange, onFileUpload, onSchedule }: ImportDi
             </ul>
             <ScrollArea className="h-24 w-full rounded-md border mt-2">
               <pre className="p-4 text-xs">
-                Mon super tweet,[{"media_url":"https://example.com/image.jpg","downloaded_filepath":"/path/to/local/image.jpg"}],[{"media_url":"https://example.com/video.mp4","downloaded_filepath":"/path/to/local/video.mp4"}]
+                {exampleCSV}
               </pre>
             </ScrollArea>
           </div>
