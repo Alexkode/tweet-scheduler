@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight, Filter } from "lucide-react";
-import { format, addDays, startOfWeek, addMonths, startOfMonth, endOfMonth, isSameMonth, isSameDay } from "date-fns";
+import { format, addDays, startOfWeek, addMonths, startOfMonth, endOfMonth, isSameMonth, isSameDay, setHours, setMinutes } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -53,6 +53,18 @@ const WeeklyCalendar = () => {
         return days;
       }
     }
+  };
+
+  const handleCellClick = (date: Date, minutes?: number) => {
+    const selectedDate = minutes !== undefined 
+      ? setMinutes(setHours(date, Math.floor(minutes / 60)), minutes % 60)
+      : date;
+    
+    navigate("/new-post", {
+      state: {
+        scheduledDate: selectedDate.toISOString(),
+      }
+    });
   };
 
   const handlePrevious = () => {
@@ -150,7 +162,8 @@ const WeeklyCalendar = () => {
             {getDays().map((day, index) => (
               <div
                 key={day.toString() + index}
-                className={`min-h-[120px] p-2 border ${
+                onClick={() => handleCellClick(day)}
+                className={`min-h-[120px] p-2 border cursor-pointer hover:bg-blue-50 transition-colors ${
                   !isSameMonth(day, currentDate) ? "bg-gray-50 text-gray-400" : ""
                 } ${isSameDay(day, new Date()) ? "bg-blue-50" : ""}`}
               >
@@ -194,7 +207,8 @@ const WeeklyCalendar = () => {
                   {getTimeSlots().map((minutes) => (
                     <div
                       key={`${day}-${minutes}`}
-                      className="h-12 border-b last:border-b-0 hover:bg-blue-50 transition-colors"
+                      onClick={() => handleCellClick(day, minutes)}
+                      className="h-12 border-b last:border-b-0 hover:bg-blue-50 transition-colors cursor-pointer"
                     ></div>
                   ))}
                 </div>
