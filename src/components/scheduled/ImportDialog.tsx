@@ -25,6 +25,7 @@ const ImportDialog = ({ open, onOpenChange, onFileUpload, onSchedule }: ImportDi
         return;
       }
       setSelectedFile(file);
+      onFileUpload(event);
     }
   };
 
@@ -35,7 +36,6 @@ const ImportDialog = ({ open, onOpenChange, onFileUpload, onSchedule }: ImportDi
     }
 
     try {
-      onFileUpload({ target: { files: [selectedFile] } } as React.ChangeEvent<HTMLInputElement>);
       onSchedule();
     } catch (error) {
       toast.error("Erreur lors de l'importation du fichier");
