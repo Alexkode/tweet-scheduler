@@ -2,11 +2,13 @@ import { useState } from "react";
 import { addDays, setHours, setMinutes } from "date-fns";
 import { Post } from "@/types/schedule";
 import { toast } from "sonner";
+import { useScheduledPosts } from "./useScheduledPosts";
 
 export const useScheduling = () => {
   const [publicationsPerDay, setPublicationsPerDay] = useState("1");
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [publicationTimes, setPublicationTimes] = useState<string[]>(["09:00"]);
+  const { addScheduledPosts } = useScheduledPosts();
 
   const handlePublicationsPerDayChange = (value: string) => {
     if (/^\d*$/.test(value)) {
@@ -30,7 +32,7 @@ export const useScheduling = () => {
     );
   };
 
-  const schedulePosts = (importedPosts: Post[]) => {
+  const schedulePosts = async (importedPosts: Post[]) => {
     if (importedPosts.length === 0) {
       toast.error("Aucun post à programmer");
       return false;
@@ -46,7 +48,7 @@ export const useScheduling = () => {
       return false;
     }
 
-    const schedule = [];
+    const schedule: { post: Post; scheduledDate: Date }[] = [];
     let currentDate = new Date();
     let postIndex = 0;
 
@@ -72,9 +74,13 @@ export const useScheduling = () => {
       currentDate = addDays(currentDate, 1);
     }
 
-    console.log("Scheduled posts:", schedule);
-    toast.success(`${schedule.length} posts programmés avec succès`);
-    return true;
+    try {
+      await addScheduledPosts.mutateAsync(schedule);
+      return true;
+    } catch (error) {
+      console.error("Error scheduling posts:", error);
+      return false;
+    }
   };
 
   return {
