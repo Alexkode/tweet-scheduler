@@ -1,6 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ImportDialogProps {
   open: boolean;
@@ -17,15 +18,19 @@ const ImportDialog = ({ open, onOpenChange, onFileUpload, onSchedule }: ImportDi
           <DialogTitle>Importer un fichier CSV</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            Format attendu : CSV avec trois colonnes :<br />
-            Colonne 1 : Texte du tweet (optionnel)<br />
-            Colonne 2 : Information des images (JSON, optionnel)<br />
-            Colonne 3 : Information des vidéos (JSON, optionnel)<br />
-            <pre className="mt-2 p-2 bg-muted rounded-md overflow-x-auto">
-              Mon super tweet,[{'"media_url":"https://example.com/image.jpg","downloaded_filepath":"/path/to/local/image.jpg"'}],[{'"media_url":"https://example.com/video.mp4","downloaded_filepath":"/path/to/local/video.mp4"'}]
-            </pre>
-          </p>
+          <div className="text-sm text-muted-foreground space-y-2">
+            <p>Format attendu : CSV avec trois colonnes :</p>
+            <ul className="list-disc pl-6 space-y-1">
+              <li>Colonne 1 : Texte du tweet (optionnel)</li>
+              <li>Colonne 2 : Information des images (JSON, optionnel)</li>
+              <li>Colonne 3 : Information des vidéos (JSON, optionnel)</li>
+            </ul>
+            <ScrollArea className="h-24 w-full rounded-md border mt-2">
+              <pre className="p-4 text-xs">
+                Mon super tweet,[{"media_url":"https://example.com/image.jpg","downloaded_filepath":"/path/to/local/image.jpg"}],[{"media_url":"https://example.com/video.mp4","downloaded_filepath":"/path/to/local/video.mp4"}]
+              </pre>
+            </ScrollArea>
+          </div>
           <Input 
             type="file" 
             accept=".csv,.txt" 

@@ -13,7 +13,6 @@ const AutoScheduleForm = () => {
   const [publicationsPerDay, setPublicationsPerDay] = useState("1");
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [importedPosts, setImportedPosts] = useState<Post[]>([]);
-  const [mediaFolder, setMediaFolder] = useState<FileSystemDirectoryHandle | null>(null);
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [publicationTimes, setPublicationTimes] = useState<string[]>(["09:00"]);
 
@@ -21,11 +20,6 @@ const AutoScheduleForm = () => {
     const file = event.target.files?.[0];
     if (file) {
       try {
-        const dirHandle = await window.showDirectoryPicker({
-          mode: 'read'
-        });
-        setMediaFolder(dirHandle);
-
         const reader = new FileReader();
         reader.onload = (e) => {
           const text = e.target?.result as string;
@@ -36,35 +30,40 @@ const AutoScheduleForm = () => {
               let imageInfo = [];
               let videoInfo = [];
               
-              if (imageInfoStr) {
-                try {
+              try {
+                if (imageInfoStr) {
                   imageInfo = JSON.parse(imageInfoStr);
-                } catch (e) {
-                  console.error("Error parsing image info:", e);
                 }
-              }
-
-              if (videoInfoStr) {
-                try {
+                if (videoInfoStr) {
                   videoInfo = JSON.parse(videoInfoStr);
-                } catch (e) {
-                  console.error("Error parsing video info:", e);
                 }
+              } catch (e) {
+                console.error("Error parsing media info:", e);
+                toast.error("Erreur lors de la lecture des informations médias");
+                return null;
               }
 
-              return { 
+              return {
                 content: content || undefined,
                 imageInfo: imageInfo.length > 0 ? imageInfo : undefined,
                 videoInfo: videoInfo.length > 0 ? videoInfo : undefined
               };
-            });
+            })
+            .filter((post): post is Post => post !== null);
+
           setImportedPosts(posts);
           console.log("Parsed posts:", posts);
+          toast.success(`${posts.length} posts importés avec succès`);
         };
+
+        reader.onerror = () => {
+          toast.error("Erreur lors de la lecture du fichier");
+        };
+
         reader.readAsText(file);
       } catch (err) {
-        console.error("Error reading file or selecting directory:", err);
-        toast.error("Erreur lors de la lecture du fichier ou de la sélection du dossier");
+        console.error("Error reading file:", err);
+        toast.error("Erreur lors de la lecture du fichier");
       }
     }
   };
