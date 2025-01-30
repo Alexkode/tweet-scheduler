@@ -1,13 +1,28 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import MainLayout from "@/components/layout/MainLayout";
+import PageTitle from "@/components/ui/PageTitle";
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <MainLayout>
+      <PageTitle 
+        title="Dashboard" 
+        description="Welcome to your social media command center"
+      />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="bg-white p-6 rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold mb-2">Quick Stats</h3>
+          <p className="text-gray-600">Connect your first account to see your stats</p>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold mb-2">Scheduled Posts</h3>
+          <p className="text-gray-600">No posts scheduled yet</p>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold mb-2">Recent Activity</h3>
+          <p className="text-gray-600">Your recent activity will appear here</p>
+        </div>
       </div>
-    </div>
+    </MainLayout>
   );
 };
 
