@@ -7,11 +7,23 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { Image, Clock, Plus, Twitter } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 const NewPostPage = () => {
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const location = useLocation();
+  const scheduledDate = location.state?.scheduledDate 
+    ? new Date(location.state.scheduledDate)
+    : new Date();
+
+  const [date, setDate] = useState<Date | undefined>(scheduledDate);
   const [content, setContent] = useState("");
-  const [time, setTime] = useState("12:00");
+  const [time, setTime] = useState(
+    scheduledDate.toLocaleTimeString('fr-FR', { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: false 
+    })
+  );
   const [thread, setThread] = useState<string[]>([""]);
 
   const addThreadPost = () => {
