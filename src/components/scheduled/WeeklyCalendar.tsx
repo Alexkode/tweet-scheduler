@@ -2,15 +2,18 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight, Filter } from "lucide-react";
-import { format, addDays, startOfWeek, addMonths, startOfMonth, endOfMonth, isSameMonth, isSameDay, getWeeksInMonth } from "date-fns";
+import { format, addDays, startOfWeek, addMonths, startOfMonth, endOfMonth, isSameMonth, isSameDay } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+type ViewType = "day" | "week" | "month";
+type ModeType = "extended" | "normal" | "compact";
+
 const WeeklyCalendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [view, setView] = useState<"day" | "week" | "month">("week");
-  const [mode, setMode] = useState<"extended" | "normal" | "compact">("normal");
+  const [view, setView] = useState<ViewType>("week");
+  const [mode, setMode] = useState<ModeType>("normal");
   const navigate = useNavigate();
 
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
@@ -84,7 +87,7 @@ const WeeklyCalendar = () => {
     <Card className="p-4">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Select value={view} onValueChange={(v: "day" | "week" | "month") => setView(v)}>
+          <Select value={view} onValueChange={(v: ViewType) => setView(v)}>
             <SelectTrigger className="w-[120px]">
               <SelectValue placeholder="Vue" />
             </SelectTrigger>
@@ -96,7 +99,7 @@ const WeeklyCalendar = () => {
           </Select>
 
           {view !== "month" && (
-            <Select value={mode} onValueChange={(v: "extended" | "normal" | "compact") => setMode(v)}>
+            <Select value={mode} onValueChange={(v: ModeType) => setMode(v)}>
               <SelectTrigger className="w-[120px]">
                 <SelectValue placeholder="Mode" />
               </SelectTrigger>
