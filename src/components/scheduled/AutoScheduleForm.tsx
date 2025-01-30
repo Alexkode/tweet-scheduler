@@ -9,11 +9,15 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 
+interface Post {
+  content: string;
+  mediaUrl: string;
+}
+
 const AutoScheduleForm = () => {
   const [publicationsPerDay, setPublicationsPerDay] = useState("1");
   const [showImportDialog, setShowImportDialog] = useState(false);
-  const [importStep, setImportStep] = useState(1);
-  const [importedPosts, setImportedPosts] = useState<Array<{ content: string, isValid: boolean }>>([]);
+  const [importedPosts, setImportedPosts] = useState<Post[]>([]);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -23,9 +27,11 @@ const AutoScheduleForm = () => {
         const text = e.target?.result as string;
         const posts = text.split('\n')
           .filter(line => line.trim())
-          .map(content => ({ content, isValid: true }));
+          .map(line => {
+            const [content, mediaUrl] = line.split(',').map(str => str.trim());
+            return { content, mediaUrl };
+          });
         setImportedPosts(posts);
-        setImportStep(2);
       };
       reader.readAsText(file);
     }
@@ -112,11 +118,7 @@ const AutoScheduleForm = () => {
               <Button 
                 variant="outline" 
                 className="w-full"
-                onClick={() => {
-                  setShowImportDialog(true);
-                  setImportStep(1);
-                  setImportedPosts([]);
-                }}
+                onClick={() => setShowImportDialog(true)}
               >
                 <Upload className="mr-2 h-4 w-4" />
                 Ajouter à partir d'un fichier (CSV)
@@ -129,68 +131,33 @@ const AutoScheduleForm = () => {
       <Dialog open={showImportDialog} onOpenChange={setShowImportDialog}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
-            <DialogTitle>
-              {importStep === 1 ? "Importer un fichier CSV" : "Prévisualisation des posts"}
-            </DialogTitle>
+            <DialogTitle>Importer un fichier CSV</DialogTitle>
           </DialogHeader>
-
-          {importStep === 1 ? (
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Format attendu : Un post par ligne. Exemple :
-                <pre className="mt-2 p-2 bg-muted rounded-md">
-                  Premier post #hashtag{"\n"}
-                  Deuxième post avec #autrehashtag{"\n"}
-                  Troisième post 🚀
-                </pre>
-              </p>
-              <Input 
-                type="file" 
-                accept=".csv,.txt" 
-                onChange={handleFileUpload}
-              />
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Format attendu : CSV avec deux colonnes :<br />
+              Colonne 1 : Texte du tweet<br />
+              Colonne 2 : Lien de l'image ou de la vidéo<br />
+              <pre className="mt-2 p-2 bg-muted rounded-md">
+                Mon super tweet,https://example.com/image.jpg{"\n"}
+                Un autre tweet cool,https://example.com/video.mp4
+              </pre>
+            </p>
+            <Input 
+              type="file" 
+              accept=".csv,.txt" 
+              onChange={handleFileUpload}
+            />
+            <div className="flex justify-end space-x-2">
+              <Button onClick={() => {
+                setShowImportDialog(false);
+                // Ici nous programmerions les posts
+                console.log("Posts à programmer:", importedPosts);
+              }}>
+                Importer
+              </Button>
             </div>
-          ) : (
-            <div className="space-y-4 max-h-[60vh] overflow-y-auto">
-              {importedPosts.map((post, index) => (
-                <div key={index} className="relative p-4 border rounded-lg">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-2 top-2"
-                    onClick={() => {
-                      const newPosts = [...importedPosts];
-                      newPosts.splice(index, 1);
-                      setImportedPosts(newPosts);
-                    }}
-                  >
-                    ✕
-                  </Button>
-                  <Textarea
-                    value={post.content}
-                    onChange={(e) => {
-                      const newPosts = [...importedPosts];
-                      newPosts[index].content = e.target.value;
-                      setImportedPosts(newPosts);
-                    }}
-                    className="min-h-[100px]"
-                  />
-                </div>
-              ))}
-              <div className="flex justify-end space-x-2 sticky bottom-0 bg-background pt-4">
-                <Button variant="outline" onClick={() => setImportStep(1)}>
-                  Retour
-                </Button>
-                <Button onClick={() => {
-                  setShowImportDialog(false);
-                  // Ici nous programmerions les posts
-                  console.log("Posts à programmer:", importedPosts);
-                }}>
-                  Valider et programmer
-                </Button>
-              </div>
-            </div>
-          )}
+          </div>
         </DialogContent>
       </Dialog>
     </>
