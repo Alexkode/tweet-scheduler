@@ -5,8 +5,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useState } from "react";
 
 const AutoScheduleForm = () => {
+  const [publicationsPerDay, setPublicationsPerDay] = useState("1");
+
   return (
     <Card>
       <CardHeader>
@@ -35,7 +38,10 @@ const AutoScheduleForm = () => {
 
           <div>
             <Label>Publications par jour</Label>
-            <Select defaultValue="1">
+            <Select 
+              value={publicationsPerDay}
+              onValueChange={setPublicationsPerDay}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Sélectionner le nombre" />
               </SelectTrigger>
@@ -51,7 +57,11 @@ const AutoScheduleForm = () => {
 
           <div>
             <Label>Horaires de publication</Label>
-            <Input type="time" defaultValue="09:00" />
+            <div className="space-y-2 mt-2">
+              {Array.from({ length: Number(publicationsPerDay) }, (_, i) => (
+                <Input key={i} type="time" defaultValue="09:00" />
+              ))}
+            </div>
           </div>
 
           <div>
