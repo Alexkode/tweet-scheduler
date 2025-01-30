@@ -12,7 +12,7 @@ export const usePostImport = () => {
       return Array.isArray(parsed) ? parsed : undefined;
     } catch (e) {
       console.error("Error parsing media info:", e);
-      throw new Error("Format JSON invalide pour les informations médias");
+      return undefined;
     }
   };
 
@@ -31,21 +31,28 @@ export const usePostImport = () => {
         reader.readAsText(file);
       });
 
-      const posts = text.split('\n')
-        .filter(line => line.trim())
-        .map((line, index) => {
-          try {
-            const [content, imageInfoStr, videoInfoStr] = line.split(',').map(str => str?.trim());
-            
-            return {
-              content: content || undefined,
-              imageInfo: parseMediaInfo(imageInfoStr),
-              videoInfo: parseMediaInfo(videoInfoStr)
-            } as Post;
-          } catch (error) {
-            throw new Error(`Erreur à la ligne ${index + 1}: ${(error as Error).message}`);
-          }
-        });
+      const lines = text.split('\n')
+        .filter(line => line.trim()); // Remove empty lines
+
+      // Skip the header row (first line)
+      const dataLines = lines.slice(1);
+      
+      const posts = dataLines.map((line, index) => {
+        try {
+          const [content, imageInfoStr, videoInfoStr] = line.split(',').map(str => str?.trim());
+          
+          const post: Post = {
+            content: content || undefined,
+            imageInfo: parseMediaInfo(imageInfoStr),
+            videoInfo: parseMediaInfo(videoInfoStr)
+          };
+
+          return post;
+        } catch (error) {
+          console.error(`Error parsing line ${index + 2}:`, error); // +2 because we skipped header and index starts at 0
+          throw new Error(`Erreur à la ligne ${index + 2}: Format invalide`);
+        }
+      });
 
       setImportedPosts(posts);
       toast.success(`${posts.length} posts importés avec succès`);
