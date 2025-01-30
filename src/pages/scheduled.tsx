@@ -12,13 +12,44 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { Clock, Upload } from "lucide-react";
+import { Clock, Upload, Calendar as CalendarIcon, ChevronDown } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+
+interface ScheduledPost {
+  id: string;
+  content: string;
+  scheduledDate: Date;
+  platform: string;
+}
 
 const ScheduledPage = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [postsPerDay, setPostsPerDay] = useState("3");
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("21:00");
+  const [scheduledPosts] = useState<ScheduledPost[]>([
+    {
+      id: "1",
+      content: "This is a scheduled post",
+      scheduledDate: new Date(),
+      platform: "Twitter",
+    },
+  ]);
+
+  const [selectedDate, setSelectedDate] = useState<Date>();
 
   return (
     <MainLayout>
@@ -40,16 +71,38 @@ const ScheduledPage = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  className="rounded-md border"
-                />
-                <div className="mt-4 space-y-4">
-                  {/* Placeholder for scheduled posts on selected date */}
-                  <div className="text-center text-muted-foreground">
-                    No posts scheduled for this date
+                <div className="flex gap-6">
+                  <div className="w-[350px]">
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      onSelect={setDate}
+                      className="rounded-md border"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-medium mb-4">
+                      Posts scheduled for {date ? format(date, 'MMMM d, yyyy') : 'today'}
+                    </h3>
+                    <div className="space-y-4">
+                      {scheduledPosts.map((post) => (
+                        <Card key={post.id}>
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between">
+                              <div>
+                                <p className="text-sm text-muted-foreground mb-2">
+                                  {format(post.scheduledDate, 'h:mm a')}
+                                </p>
+                                <p className="text-sm">{post.content}</p>
+                              </div>
+                              <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                {post.platform}
+                              </span>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -65,11 +118,24 @@ const ScheduledPage = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-4">
-                  {/* Placeholder for list of scheduled posts */}
-                  <div className="text-center py-8 text-muted-foreground">
-                    No scheduled posts yet
-                  </div>
+                <div className="space-y-4">
+                  {scheduledPosts.map((post) => (
+                    <Card key={post.id}>
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <p className="text-sm text-muted-foreground mb-2">
+                              {format(post.scheduledDate, 'MMMM d, yyyy - h:mm a')}
+                            </p>
+                            <p className="text-sm">{post.content}</p>
+                          </div>
+                          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                            {post.platform}
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               </CardContent>
             </Card>
@@ -89,25 +155,31 @@ const ScheduledPage = () => {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="posts-per-day">Posts per day</Label>
-                        <Input
-                          id="posts-per-day"
-                          type="number"
-                          value={postsPerDay}
-                          onChange={(e) => setPostsPerDay(e.target.value)}
-                          min="1"
-                          max="24"
-                        />
+                        <Select defaultValue={postsPerDay} onValueChange={setPostsPerDay}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select posts per day" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {[1, 2, 3, 4, 5].map((num) => (
+                              <SelectItem key={num} value={num.toString()}>
+                                {num} {num === 1 ? 'post' : 'posts'}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                       <div>
                         <Label htmlFor="timezone">Timezone</Label>
-                        <select
-                          id="timezone"
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                          <option value="UTC">UTC</option>
-                          <option value="America/New_York">Eastern Time</option>
-                          <option value="America/Los_Angeles">Pacific Time</option>
-                        </select>
+                        <Select defaultValue="UTC">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select timezone" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="UTC">UTC</SelectItem>
+                            <SelectItem value="America/New_York">Eastern Time</SelectItem>
+                            <SelectItem value="America/Los_Angeles">Pacific Time</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
@@ -128,6 +200,36 @@ const ScheduledPage = () => {
                           value={endTime}
                           onChange={(e) => setEndTime(e.target.value)}
                         />
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label>Schedule Days</Label>
+                          <Select defaultValue="all">
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select days" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">All Days</SelectItem>
+                              <SelectItem value="weekdays">Weekdays Only</SelectItem>
+                              <SelectItem value="weekends">Weekends Only</SelectItem>
+                              <SelectItem value="custom">Custom Days</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label>Post Order</Label>
+                          <Select defaultValue="fifo">
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select order" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="fifo">First In, First Out</SelectItem>
+                              <SelectItem value="random">Random</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
                     </div>
                   </div>
