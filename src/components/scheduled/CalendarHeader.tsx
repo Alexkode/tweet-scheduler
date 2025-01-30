@@ -3,7 +3,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ChevronLeft, ChevronRight, Filter } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { useNavigate } from "react-router-dom";
 
 type ViewType = "day" | "week" | "month";
 type ModeType = "extended" | "normal" | "compact";
@@ -29,8 +28,6 @@ const CalendarHeader = ({
   onPrevious,
   onNext,
 }: CalendarHeaderProps) => {
-  const navigate = useNavigate();
-
   return (
     <div className="flex items-center justify-between mb-4">
       <div className="flex items-center gap-2">
@@ -77,10 +74,6 @@ const CalendarHeader = ({
           <Filter className="h-4 w-4" />
         </Button>
       </div>
-
-      <Button onClick={() => navigate("/new-post")} className="bg-blue-500 hover:bg-blue-600">
-        Créer une publication
-      </Button>
     </div>
   );
 };
