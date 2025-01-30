@@ -7,40 +7,81 @@ import { Upload, Twitter } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 
 interface Post {
   content: string;
-  mediaUrl: string;
+  mediaInfo: {
+    media_url: string;
+    downloaded_filepath: string;
+  }[];
 }
 
 const AutoScheduleForm = () => {
   const [publicationsPerDay, setPublicationsPerDay] = useState("1");
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [importedPosts, setImportedPosts] = useState<Post[]>([]);
+  const [mediaFolder, setMediaFolder] = useState<FileSystemDirectoryHandle | null>(null);
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const text = e.target?.result as string;
-        const posts = text.split('\n')
-          .filter(line => line.trim())
-          .map(line => {
-            const [content, mediaUrl] = line.split(',').map(str => str.trim());
-            return { content, mediaUrl };
-          });
-        setImportedPosts(posts);
-      };
-      reader.readAsText(file);
+      try {
+        // Demander à l'utilisateur de sélectionner le dossier contenant les médias
+        const dirHandle = await window.showDirectoryPicker({
+          mode: 'read'
+        });
+        setMediaFolder(dirHandle);
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const text = e.target?.result as string;
+          const posts = text.split('\n')
+            .filter(line => line.trim())
+            .map(line => {
+              const [content, mediaInfoStr] = line.split(',').map(str => str.trim());
+              let mediaInfo;
+              try {
+                mediaInfo = JSON.parse(mediaInfoStr);
+              } catch (e) {
+                console.error("Error parsing media info:", e);
+                mediaInfo = [];
+              }
+              return { content, mediaInfo };
+            });
+          setImportedPosts(posts);
+          console.log("Parsed posts:", posts);
+        };
+        reader.readAsText(file);
+      } catch (err) {
+        console.error("Error reading file or selecting directory:", err);
+        toast.error("Erreur lors de la lecture du fichier ou de la sélection du dossier");
+      }
     }
   };
 
-  const handlePublicationsPerDayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+  const handlePublicationsPerDayChange = (value: string) => {
     if (/^\d*$/.test(value)) {
       setPublicationsPerDay(value);
+    }
+  };
+
+  const handleImport = async () => {
+    if (!mediaFolder) {
+      toast.error("Veuillez d'abord sélectionner le dossier contenant les médias");
+      return;
+    }
+
+    try {
+      // Ici vous pouvez ajouter la logique pour programmer les posts
+      console.log("Posts à programmer:", importedPosts);
+      console.log("Dossier médias sélectionné:", mediaFolder);
+      
+      setShowImportDialog(false);
+      toast.success("Posts importés avec succès");
+    } catch (err) {
+      console.error("Error importing posts:", err);
+      toast.error("Erreur lors de l'importation des posts");
     }
   };
 
@@ -59,10 +100,25 @@ const AutoScheduleForm = () => {
 
             <div>
               <Label>Compte</Label>
-              <Button variant="outline" className="w-full justify-start mt-2">
-                <Twitter className="w-4 h-4 mr-2 text-[#1DA1F2]" />
-                Sélectionner un compte Twitter
-              </Button>
+              <Select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner un compte Twitter" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="account1">
+                    <div className="flex items-center">
+                      <Twitter className="w-4 h-4 mr-2 text-[#1DA1F2]" />
+                      Compte Twitter 1
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="account2">
+                    <div className="flex items-center">
+                      <Twitter className="w-4 h-4 mr-2 text-[#1DA1F2]" />
+                      Compte Twitter 2
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
@@ -85,7 +141,7 @@ const AutoScheduleForm = () => {
                 type="number"
                 min="1"
                 value={publicationsPerDay}
-                onChange={handlePublicationsPerDayChange}
+                onChange={(e) => handlePublicationsPerDayChange(e.target.value)}
                 className="mt-2"
               />
             </div>
@@ -137,10 +193,9 @@ const AutoScheduleForm = () => {
             <p className="text-sm text-muted-foreground">
               Format attendu : CSV avec deux colonnes :<br />
               Colonne 1 : Texte du tweet<br />
-              Colonne 2 : Lien de l'image ou de la vidéo<br />
+              Colonne 2 : Information du média (JSON)<br />
               <pre className="mt-2 p-2 bg-muted rounded-md">
-                Mon super tweet,https://example.com/image.jpg{"\n"}
-                Un autre tweet cool,https://example.com/video.mp4
+                Mon super tweet,[{'"media_url":"https://example.com/image.jpg","downloaded_filepath":"/path/to/local/image.jpg"'}]
               </pre>
             </p>
             <Input 
@@ -149,11 +204,7 @@ const AutoScheduleForm = () => {
               onChange={handleFileUpload}
             />
             <div className="flex justify-end space-x-2">
-              <Button onClick={() => {
-                setShowImportDialog(false);
-                // Ici nous programmerions les posts
-                console.log("Posts à programmer:", importedPosts);
-              }}>
+              <Button onClick={handleImport}>
                 Importer
               </Button>
             </div>
