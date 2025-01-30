@@ -44,10 +44,10 @@ const AutoScheduleForm = () => {
               }
 
               return {
-                content: content || undefined,
+                content,
                 imageInfo: imageInfo.length > 0 ? imageInfo : undefined,
                 videoInfo: videoInfo.length > 0 ? videoInfo : undefined
-              };
+              } as Post;
             })
             .filter((post): post is Post => post !== null);
 
