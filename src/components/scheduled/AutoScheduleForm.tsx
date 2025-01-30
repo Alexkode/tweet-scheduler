@@ -8,13 +8,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { addDays, format, parse, setHours, setMinutes } from "date-fns";
+
+interface MediaInfo {
+  media_url: string;
+  downloaded_filepath: string;
+}
 
 interface Post {
-  content: string;
-  mediaInfo: {
-    media_url: string;
-    downloaded_filepath: string;
-  }[];
+  content?: string;
+  mediaInfo?: MediaInfo[];
 }
 
 const AutoScheduleForm = () => {
@@ -22,12 +25,13 @@ const AutoScheduleForm = () => {
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [importedPosts, setImportedPosts] = useState<Post[]>([]);
   const [mediaFolder, setMediaFolder] = useState<FileSystemDirectoryHandle | null>(null);
+  const [selectedDays, setSelectedDays] = useState<string[]>([]);
+  const [publicationTimes, setPublicationTimes] = useState<string[]>(["09:00"]);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       try {
-        // Demander à l'utilisateur de sélectionner le dossier contenant les médias
         const dirHandle = await window.showDirectoryPicker({
           mode: 'read'
         });
@@ -39,15 +43,21 @@ const AutoScheduleForm = () => {
           const posts = text.split('\n')
             .filter(line => line.trim())
             .map(line => {
-              const [content, mediaInfoStr] = line.split(',').map(str => str.trim());
-              let mediaInfo;
-              try {
-                mediaInfo = JSON.parse(mediaInfoStr);
-              } catch (e) {
-                console.error("Error parsing media info:", e);
-                mediaInfo = [];
+              const [content, mediaInfoStr] = line.split(',').map(str => str?.trim());
+              let mediaInfo: MediaInfo[] = [];
+              
+              if (mediaInfoStr) {
+                try {
+                  mediaInfo = JSON.parse(mediaInfoStr);
+                } catch (e) {
+                  console.error("Error parsing media info:", e);
+                }
               }
-              return { content, mediaInfo };
+
+              return { 
+                content: content || undefined,
+                mediaInfo: mediaInfo.length > 0 ? mediaInfo : undefined
+              };
             });
           setImportedPosts(posts);
           console.log("Parsed posts:", posts);
@@ -63,26 +73,72 @@ const AutoScheduleForm = () => {
   const handlePublicationsPerDayChange = (value: string) => {
     if (/^\d*$/.test(value)) {
       setPublicationsPerDay(value);
+      // Update publication times array
+      const times = Array(Number(value)).fill("09:00");
+      setPublicationTimes(times);
     }
   };
 
-  const handleImport = async () => {
-    if (!mediaFolder) {
-      toast.error("Veuillez d'abord sélectionner le dossier contenant les médias");
+  const handleTimeChange = (index: number, time: string) => {
+    const newTimes = [...publicationTimes];
+    newTimes[index] = time;
+    setPublicationTimes(newTimes);
+  };
+
+  const handleDayToggle = (day: string) => {
+    setSelectedDays(prev => 
+      prev.includes(day) 
+        ? prev.filter(d => d !== day)
+        : [...prev, day]
+    );
+  };
+
+  const schedulePosts = () => {
+    if (importedPosts.length === 0) {
+      toast.error("Aucun post à programmer");
       return;
     }
 
-    try {
-      // Ici vous pouvez ajouter la logique pour programmer les posts
-      console.log("Posts à programmer:", importedPosts);
-      console.log("Dossier médias sélectionné:", mediaFolder);
-      
-      setShowImportDialog(false);
-      toast.success("Posts importés avec succès");
-    } catch (err) {
-      console.error("Error importing posts:", err);
-      toast.error("Erreur lors de l'importation des posts");
+    if (selectedDays.length === 0) {
+      toast.error("Veuillez sélectionner au moins un jour de publication");
+      return;
     }
+
+    if (publicationTimes.length === 0) {
+      toast.error("Veuillez définir au moins un horaire de publication");
+      return;
+    }
+
+    // Calculate schedule dates based on selected days and times
+    const schedule = [];
+    let currentDate = new Date();
+    let postIndex = 0;
+
+    while (postIndex < importedPosts.length) {
+      const dayName = format(currentDate, 'EEEE').toLowerCase();
+      
+      if (selectedDays.includes(dayName)) {
+        for (const time of publicationTimes) {
+          if (postIndex >= importedPosts.length) break;
+
+          const [hours, minutes] = time.split(':').map(Number);
+          const scheduleDate = setMinutes(setHours(currentDate, hours), minutes);
+
+          schedule.push({
+            post: importedPosts[postIndex],
+            scheduledDate: scheduleDate
+          });
+
+          postIndex++;
+        }
+      }
+
+      currentDate = addDays(currentDate, 1);
+    }
+
+    console.log("Scheduled posts:", schedule);
+    toast.success(`${schedule.length} posts programmés avec succès`);
+    setShowImportDialog(false);
   };
 
   return (
@@ -111,26 +167,6 @@ const AutoScheduleForm = () => {
                       Compte Twitter 1
                     </div>
                   </SelectItem>
-                  <SelectItem value="account2">
-                    <div className="flex items-center">
-                      <Twitter className="w-4 h-4 mr-2 text-[#1DA1F2]" />
-                      Compte Twitter 2
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label>Fuseau horaire</Label>
-              <Select defaultValue="Europe/Paris">
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner un fuseau horaire" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Europe/Paris">Europe/Paris</SelectItem>
-                  <SelectItem value="America/New_York">America/New York</SelectItem>
-                  <SelectItem value="Asia/Tokyo">Asia/Tokyo</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -149,8 +185,13 @@ const AutoScheduleForm = () => {
             <div>
               <Label>Horaires de publication</Label>
               <div className="space-y-2 mt-2">
-                {Array.from({ length: Number(publicationsPerDay) }, (_, i) => (
-                  <Input key={i} type="time" defaultValue="09:00" />
+                {publicationTimes.map((time, index) => (
+                  <Input 
+                    key={index}
+                    type="time"
+                    value={time}
+                    onChange={(e) => handleTimeChange(index, e.target.value)}
+                  />
                 ))}
               </div>
             </div>
@@ -158,10 +199,14 @@ const AutoScheduleForm = () => {
             <div>
               <Label>Jours de publication</Label>
               <div className="grid grid-cols-7 gap-2 mt-2">
-                {['Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa', 'Di'].map((day) => (
+                {['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'].map((day) => (
                   <div key={day} className="flex items-center space-x-2">
-                    <Checkbox id={day} />
-                    <Label htmlFor={day}>{day}</Label>
+                    <Checkbox 
+                      id={day}
+                      checked={selectedDays.includes(day)}
+                      onCheckedChange={() => handleDayToggle(day)}
+                    />
+                    <Label htmlFor={day}>{day.charAt(0).toUpperCase() + day.slice(1, 3)}</Label>
                   </div>
                 ))}
               </div>
@@ -191,11 +236,12 @@ const AutoScheduleForm = () => {
           </DialogHeader>
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Format attendu : CSV avec deux colonnes :<br />
-              Colonne 1 : Texte du tweet<br />
-              Colonne 2 : Information du média (JSON)<br />
-              <pre className="mt-2 p-2 bg-muted rounded-md">
-                Mon super tweet,[{'"media_url":"https://example.com/image.jpg","downloaded_filepath":"/path/to/local/image.jpg"'}]
+              Format attendu : CSV avec trois colonnes :<br />
+              Colonne 1 : Texte du tweet (optionnel)<br />
+              Colonne 2 : Information de l'image (JSON, optionnel)<br />
+              Colonne 3 : Information de la vidéo (JSON, optionnel)<br />
+              <pre className="mt-2 p-2 bg-muted rounded-md overflow-x-auto">
+                Mon super tweet,[{'"media_url":"https://example.com/image.jpg","downloaded_filepath":"/path/to/local/image.jpg"'}],[{'"media_url":"https://example.com/video.mp4","downloaded_filepath":"/path/to/local/video.mp4"'}]
               </pre>
             </p>
             <Input 
@@ -204,8 +250,8 @@ const AutoScheduleForm = () => {
               onChange={handleFileUpload}
             />
             <div className="flex justify-end space-x-2">
-              <Button onClick={handleImport}>
-                Importer
+              <Button onClick={schedulePosts}>
+                Importer et programmer
               </Button>
             </div>
           </div>
