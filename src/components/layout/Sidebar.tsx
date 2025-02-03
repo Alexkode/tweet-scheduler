@@ -30,10 +30,10 @@ const Sidebar = () => {
   return (
     <SidebarComponent>
       <SidebarContent>
-        <div className="flex items-center justify-between p-4">
+        <div className="relative flex items-center p-4">
           <h1 className="text-2xl font-bold text-primary">SocialManager</h1>
-          <div className="relative z-50">
-            <SidebarTrigger className="relative" />
+          <div className="absolute right-4 top-1/2 -translate-y-1/2">
+            <SidebarTrigger />
           </div>
         </div>
         <SidebarGroup>
