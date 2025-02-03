@@ -6,17 +6,22 @@ import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { Image, Clock, Plus, Twitter } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { Image, Clock, Plus, Send } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
+import { Post } from "@/types/schedule";
 
 const NewPostPage = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
   const scheduledDate = location.state?.scheduledDate 
     ? new Date(location.state.scheduledDate)
     : new Date();
 
   const [date, setDate] = useState<Date | undefined>(scheduledDate);
-  const [content, setContent] = useState("");
   const [time, setTime] = useState(
     scheduledDate.toLocaleTimeString('fr-FR', { 
       hour: '2-digit', 
@@ -25,6 +30,7 @@ const NewPostPage = () => {
     })
   );
   const [thread, setThread] = useState<string[]>([""]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const addThreadPost = () => {
     setThread([...thread, ""]);
@@ -34,6 +40,77 @@ const NewPostPage = () => {
     const newThread = [...thread];
     newThread[index] = value;
     setThread(newThread);
+  };
+
+  const handleSchedulePost = async () => {
+    try {
+      setIsLoading(true);
+
+      if (!date || !time) {
+        toast({
+          title: "Error",
+          description: "Please select a date and time",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const [hours, minutes] = time.split(':');
+      const scheduledDateTime = new Date(date);
+      scheduledDateTime.setHours(parseInt(hours, 10));
+      scheduledDateTime.setMinutes(parseInt(minutes, 10));
+
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to schedule posts",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Create posts for each thread entry
+      for (const content of thread) {
+        if (!content.trim()) continue;
+
+        const post: Partial<Post> = {
+          content: content.trim(),
+          scheduled_date: scheduledDateTime.toISOString(),
+        };
+
+        const { error } = await supabase
+          .from('scheduled_posts')
+          .insert([{ ...post, user_id: user.id }]);
+
+        if (error) {
+          console.error('Error scheduling post:', error);
+          toast({
+            title: "Error",
+            description: "Failed to schedule post. Please try again.",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+
+      toast({
+        title: "Success",
+        description: "Posts scheduled successfully",
+      });
+
+      navigate('/scheduled');
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -52,14 +129,18 @@ const NewPostPage = () => {
                   )}
                   <Textarea
                     placeholder={index === 0 ? "What's on your mind?" : "Continue your thread..."}
-                    className="min-h-[100px]"
+                    className="min-h-[100px] resize-none"
                     value={post}
                     onChange={(e) => updateThreadPost(index, e.target.value)}
                   />
                 </div>
               ))}
               <div className="flex gap-2 mt-4">
-                <Button variant="outline" size="icon" onClick={addThreadPost}>
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  onClick={addThreadPost}
+                >
                   <Plus className="w-4 h-4" />
                 </Button>
                 <Button variant="outline" size="icon">
@@ -107,26 +188,24 @@ const NewPostPage = () => {
                 {thread.map((post, index) => (
                   <div key={index} className="border rounded-lg p-4 bg-card">
                     <div className="flex items-center gap-2 mb-2">
-                      <Twitter className="w-5 h-5 text-[#1DA1F2]" />
+                      <Send className="w-5 h-5 text-primary" />
                       <span className="font-medium">Preview</span>
                     </div>
-                    <p className="text-sm">{post || "Your post preview will appear here"}</p>
+                    <p className="text-sm whitespace-pre-wrap">
+                      {post || "Your post preview will appear here"}
+                    </p>
                   </div>
                 ))}
               </div>
             </Card>
             
-            <Card className="p-4">
-              <h2 className="text-xl font-semibold mb-4">Post to</h2>
-              <div className="space-y-2">
-                <Button variant="outline" className="w-full justify-start">
-                  <Twitter className="w-4 h-4 mr-2 text-[#1DA1F2]" />
-                  Select Twitter Account
-                </Button>
-              </div>
-            </Card>
-            
-            <Button className="w-full">Schedule Post</Button>
+            <Button 
+              className="w-full" 
+              onClick={handleSchedulePost}
+              disabled={isLoading}
+            >
+              {isLoading ? "Scheduling..." : "Schedule Post"}
+            </Button>
           </div>
         </div>
       </div>

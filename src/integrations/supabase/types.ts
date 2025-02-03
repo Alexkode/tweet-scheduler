@@ -63,6 +63,36 @@ export type Database = {
         }
         Relationships: []
       }
+      scheduled_posts: {
+        Row: {
+          content: string | null
+          created_at: string
+          id: string
+          image_info: Json | null
+          scheduled_date: string
+          user_id: string
+          video_info: Json | null
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          image_info?: Json | null
+          scheduled_date: string
+          user_id: string
+          video_info?: Json | null
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          image_info?: Json | null
+          scheduled_date?: string
+          user_id?: string
+          video_info?: Json | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
