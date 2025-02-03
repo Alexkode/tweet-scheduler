@@ -33,9 +33,6 @@ const Sidebar = () => {
         <SidebarContent>
           <div className="flex items-center justify-between p-4">
             <h1 className="text-2xl font-bold text-primary">SocialManager</h1>
-            <div className="md:hidden">
-              <SidebarTrigger />
-            </div>
           </div>
           <SidebarGroup>
             <SidebarGroupContent>
@@ -66,8 +63,8 @@ const Sidebar = () => {
         </SidebarFooter>
       </SidebarComponent>
       
-      {/* Bouton pour rabattre la sidebar en version desktop */}
-      <div className="hidden md:block fixed bottom-4 left-4 z-50">
+      {/* Bouton pour rabattre la sidebar */}
+      <div className="fixed top-4 right-4 z-50">
         <SidebarTrigger />
       </div>
     </>
