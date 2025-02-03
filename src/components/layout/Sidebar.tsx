@@ -1,4 +1,4 @@
-import { Calendar, Home, Plus, Clock, Users, Settings, Sun, Moon, Menu } from "lucide-react";
+import { Calendar, Home, Plus, Clock, Users, Settings, Sun, Moon } from "lucide-react";
 import {
   Sidebar as SidebarComponent,
   SidebarContent,
@@ -9,7 +9,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarFooter,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -32,9 +31,6 @@ const Sidebar = () => {
       <SidebarContent>
         <div className="relative flex items-center p-4">
           <h1 className="text-2xl font-bold text-primary">SocialManager</h1>
-          <div className="absolute right-4 top-4 z-50">
-            <SidebarTrigger />
-          </div>
         </div>
         <SidebarGroup>
           <SidebarGroupContent>
