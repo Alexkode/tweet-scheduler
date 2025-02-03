@@ -32,7 +32,7 @@ const Sidebar = () => {
       <SidebarContent>
         <div className="relative flex items-center p-4">
           <h1 className="text-2xl font-bold text-primary">SocialManager</h1>
-          <div className="absolute right-4 top-1/2 -translate-y-1/2">
+          <div className="fixed right-4 z-50">
             <SidebarTrigger />
           </div>
         </div>
