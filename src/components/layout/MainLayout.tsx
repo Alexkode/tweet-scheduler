@@ -8,7 +8,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const { signOut } = useAuth();
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full bg-secondary">
         <Sidebar />
         <main className="flex-1 p-4 md:p-6 overflow-x-hidden">
