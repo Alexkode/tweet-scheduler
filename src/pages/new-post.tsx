@@ -7,24 +7,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { Image, Clock, Plus, Send } from "lucide-react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { Post } from "@/types/schedule";
 import { useAuth } from "@/hooks/useAuth";
 
 const NewPostPage = () => {
-  const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
   
-  const scheduledDate = location.state?.scheduledDate 
-    ? new Date(location.state.scheduledDate)
-    : new Date();
-
-  const [date, setDate] = useState<Date | undefined>(scheduledDate);
+  const [date, setDate] = useState<Date>(new Date());
   const [time, setTime] = useState(
-    scheduledDate.toLocaleTimeString('fr-FR', { 
+    new Date().toLocaleTimeString('fr-FR', { 
       hour: '2-digit', 
       minute: '2-digit',
       hour12: false 
@@ -48,7 +43,7 @@ const NewPostPage = () => {
       setIsLoading(true);
 
       if (!date || !time || !user) {
-        toast.error("Please select a date and time");
+        toast.error("Veuillez sélectionner une date et une heure");
         return;
       }
 
@@ -73,16 +68,16 @@ const NewPostPage = () => {
 
         if (error) {
           console.error('Error scheduling post:', error);
-          toast.error("Failed to schedule post. Please try again.");
+          toast.error("Échec de la programmation du post. Veuillez réessayer.");
           return;
         }
       }
 
-      toast.success("Posts scheduled successfully");
+      toast.success("Posts programmés avec succès");
       navigate('/scheduled');
     } catch (error) {
       console.error('Error:', error);
-      toast.error("An unexpected error occurred");
+      toast.error("Une erreur inattendue s'est produite");
     } finally {
       setIsLoading(false);
     }
@@ -91,7 +86,7 @@ const NewPostPage = () => {
   return (
     <MainLayout>
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold">Create New Post</h1>
+        <h1 className="text-3xl font-bold">Créer un nouveau post</h1>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-4">
             <Card className="p-4">
@@ -103,7 +98,7 @@ const NewPostPage = () => {
                     </div>
                   )}
                   <Textarea
-                    placeholder={index === 0 ? "What's on your mind?" : "Continue your thread..."}
+                    placeholder={index === 0 ? "Qu'avez-vous en tête ?" : "Continuez votre thread..."}
                     className="min-h-[100px] resize-none"
                     value={post}
                     onChange={(e) => updateThreadPost(index, e.target.value)}
@@ -130,7 +125,7 @@ const NewPostPage = () => {
             <Card className="p-4">
               <div className="space-y-4">
                 <div>
-                  <Label>Schedule for</Label>
+                  <Label>Programmer pour</Label>
                   <div className="grid grid-cols-2 gap-4 mt-2">
                     <Input
                       type="time"
@@ -149,7 +144,7 @@ const NewPostPage = () => {
                 <Calendar
                   mode="single"
                   selected={date}
-                  onSelect={setDate}
+                  onSelect={(newDate) => newDate && setDate(newDate)}
                   className="rounded-md border"
                 />
               </div>
@@ -158,16 +153,16 @@ const NewPostPage = () => {
           
           <div className="space-y-4">
             <Card className="p-4">
-              <h2 className="text-xl font-semibold mb-4">Preview</h2>
+              <h2 className="text-xl font-semibold mb-4">Aperçu</h2>
               <div className="space-y-4">
                 {thread.map((post, index) => (
                   <div key={index} className="border rounded-lg p-4 bg-card">
                     <div className="flex items-center gap-2 mb-2">
                       <Send className="w-5 h-5 text-primary" />
-                      <span className="font-medium">Preview</span>
+                      <span className="font-medium">Aperçu</span>
                     </div>
                     <p className="text-sm whitespace-pre-wrap">
-                      {post || "Your post preview will appear here"}
+                      {post || "Votre aperçu apparaîtra ici"}
                     </p>
                   </div>
                 ))}
@@ -179,7 +174,7 @@ const NewPostPage = () => {
               onClick={handleSchedulePost}
               disabled={isLoading}
             >
-              {isLoading ? "Scheduling..." : "Schedule Post"}
+              {isLoading ? "Programmation..." : "Programmer le post"}
             </Button>
           </div>
         </div>
