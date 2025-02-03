@@ -28,46 +28,40 @@ const Sidebar = () => {
   const { theme, setTheme } = useTheme();
 
   return (
-    <>
-      <SidebarComponent>
-        <SidebarContent>
-          <div className="flex items-center justify-between p-4">
-            <h1 className="text-2xl font-bold text-primary">SocialManager</h1>
-          </div>
-          <SidebarGroup>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {menuItems.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton 
-                      onClick={() => navigate(item.path)}
-                      tooltip={item.title}
-                    >
-                      <item.icon className="w-5 h-5" />
-                      <span>{item.title}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        </SidebarContent>
-        <SidebarFooter className="p-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          >
-            {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-          </Button>
-        </SidebarFooter>
-      </SidebarComponent>
-      
-      {/* Bouton pour rabattre la sidebar */}
-      <div className="fixed top-4 right-4 z-50">
-        <SidebarTrigger />
-      </div>
-    </>
+    <SidebarComponent>
+      <SidebarContent>
+        <div className="flex items-center justify-between p-4">
+          <h1 className="text-2xl font-bold text-primary">SocialManager</h1>
+          <SidebarTrigger />
+        </div>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {menuItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton 
+                    onClick={() => navigate(item.path)}
+                    tooltip={item.title}
+                  >
+                    <item.icon className="w-5 h-5" />
+                    <span>{item.title}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarFooter className="p-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        >
+          {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+        </Button>
+      </SidebarFooter>
+    </SidebarComponent>
   );
 };
 
