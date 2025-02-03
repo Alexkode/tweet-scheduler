@@ -32,7 +32,7 @@ const PostActions = () => {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 shadow-lg z-50">
+    <div className="bg-white border-t p-4 shadow-lg rounded-b-lg">
       {isScheduled && date ? (
         <ScheduledActions
           scheduledTime={new Date(date)}
