@@ -8,14 +8,15 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { Image, Clock, Plus, Send } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 import { Post } from "@/types/schedule";
+import { useAuth } from "@/hooks/useAuth";
 
 const NewPostPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { user } = useAuth();
   
   const scheduledDate = location.state?.scheduledDate 
     ? new Date(location.state.scheduledDate)
@@ -46,12 +47,8 @@ const NewPostPage = () => {
     try {
       setIsLoading(true);
 
-      if (!date || !time) {
-        toast({
-          title: "Error",
-          description: "Please select a date and time",
-          variant: "destructive",
-        });
+      if (!date || !time || !user) {
+        toast.error("Please select a date and time");
         return;
       }
 
@@ -60,54 +57,32 @@ const NewPostPage = () => {
       scheduledDateTime.setHours(parseInt(hours, 10));
       scheduledDateTime.setMinutes(parseInt(minutes, 10));
 
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (!user) {
-        toast({
-          title: "Error",
-          description: "You must be logged in to schedule posts",
-          variant: "destructive",
-        });
-        return;
-      }
-
       // Create posts for each thread entry
       for (const content of thread) {
         if (!content.trim()) continue;
 
-        const post: Partial<Post> = {
+        const post: Post = {
           content: content.trim(),
           scheduled_date: scheduledDateTime.toISOString(),
+          user_id: user.id,
         };
 
         const { error } = await supabase
           .from('scheduled_posts')
-          .insert([{ ...post, user_id: user.id }]);
+          .insert(post);
 
         if (error) {
           console.error('Error scheduling post:', error);
-          toast({
-            title: "Error",
-            description: "Failed to schedule post. Please try again.",
-            variant: "destructive",
-          });
+          toast.error("Failed to schedule post. Please try again.");
           return;
         }
       }
 
-      toast({
-        title: "Success",
-        description: "Posts scheduled successfully",
-      });
-
+      toast.success("Posts scheduled successfully");
       navigate('/scheduled');
     } catch (error) {
       console.error('Error:', error);
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred",
-        variant: "destructive",
-      });
+      toast.error("An unexpected error occurred");
     } finally {
       setIsLoading(false);
     }
