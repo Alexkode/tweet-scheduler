@@ -5,7 +5,6 @@ import { toast } from 'sonner';
 
 interface ScheduledPost extends Post {
   id: string;
-  scheduled_date: string;
 }
 
 export const useScheduledPosts = () => {
@@ -35,10 +34,10 @@ export const useScheduledPosts = () => {
         .insert(
           posts.map(({ post, scheduledDate }) => ({
             content: post.content,
-            image_info: post.imageInfo,
-            video_info: post.videoInfo,
+            image_info: post.image_info,
+            video_info: post.video_info,
             scheduled_date: scheduledDate.toISOString(),
-            user_id: supabase.auth.getUser().then(({ data }) => data.user?.id),
+            user_id: post.user_id,
           }))
         )
         .select();

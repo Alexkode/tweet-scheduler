@@ -43,13 +43,15 @@ export const usePostImport = () => {
           
           const post: Post = {
             content: content || undefined,
-            imageInfo: parseMediaInfo(imageInfoStr),
-            videoInfo: parseMediaInfo(videoInfoStr)
+            image_info: parseMediaInfo(imageInfoStr),
+            video_info: parseMediaInfo(videoInfoStr),
+            scheduled_date: new Date().toISOString(), // Default to current date
+            user_id: '' // This will be set when actually saving the post
           };
 
           return post;
         } catch (error) {
-          console.error(`Error parsing line ${index + 2}:`, error); // +2 because we skipped header and index starts at 0
+          console.error(`Error parsing line ${index + 2}:`, error);
           throw new Error(`Erreur à la ligne ${index + 2}: Format invalide`);
         }
       });
