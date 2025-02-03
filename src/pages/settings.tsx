@@ -13,8 +13,8 @@ import { Label } from "@/components/ui/label";
 const SettingsPage = () => {
   return (
     <MainLayout>
-      <div className="space-y-6">
-        <h1 className="text-3xl font-bold">Settings</h1>
+      <div className="space-y-6 max-w-3xl mx-auto">
+        <h1 className="text-2xl sm:text-3xl font-bold">Settings</h1>
         <div className="grid gap-6">
           <Card>
             <CardHeader>
@@ -30,6 +30,7 @@ const SettingsPage = () => {
                   id="email"
                   type="email"
                   placeholder="Enter your email"
+                  className="w-full sm:w-2/3"
                 />
               </div>
               <div className="space-y-2">
@@ -38,6 +39,7 @@ const SettingsPage = () => {
                   id="name"
                   type="text"
                   placeholder="Enter your display name"
+                  className="w-full sm:w-2/3"
                 />
               </div>
               <Button>Save Changes</Button>

@@ -8,9 +8,9 @@ const ScheduledPage = () => {
   return (
     <MainLayout>
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold">Publications programmées</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">Publications programmées</h1>
         <Tabs defaultValue="calendar" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
+          <TabsList className="w-full sm:w-auto grid grid-cols-3 sm:inline-flex gap-1">
             <TabsTrigger value="calendar">Calendrier</TabsTrigger>
             <TabsTrigger value="list">Liste</TabsTrigger>
             <TabsTrigger value="auto">Listes automatiques</TabsTrigger>

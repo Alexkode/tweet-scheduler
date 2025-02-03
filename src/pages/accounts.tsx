@@ -13,15 +13,15 @@ const AccountsPage = () => {
   return (
     <MainLayout>
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold">Connected Accounts</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <h1 className="text-2xl sm:text-3xl font-bold">Connected Accounts</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {socialPlatforms.map((platform) => (
             <Card key={platform.name}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-xl font-semibold">
+                <CardTitle className="text-lg sm:text-xl font-semibold">
                   {platform.name}
                 </CardTitle>
-                <platform.icon className={`w-6 h-6 ${platform.color}`} />
+                <platform.icon className={`w-5 h-5 sm:w-6 sm:h-6 ${platform.color}`} />
               </CardHeader>
               <CardContent>
                 <Button className="w-full" variant="outline">

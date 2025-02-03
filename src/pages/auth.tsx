@@ -56,9 +56,9 @@ const AuthPage = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-secondary p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md mx-4">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Bienvenue</CardTitle>
+          <CardTitle className="text-xl sm:text-2xl font-bold">Bienvenue</CardTitle>
           <CardDescription>
             Connectez-vous ou créez un compte pour continuer
           </CardDescription>

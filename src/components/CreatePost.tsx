@@ -15,12 +15,6 @@ interface ThreadPost {
   isCollapsed?: boolean;
 }
 
-// Mock data for Twitter accounts
-const twitterAccounts = [
-  { id: "1", handle: "@primary_account" },
-  { id: "2", handle: "@secondary_account" },
-];
-
 const CreatePost = () => {
   const isMobile = useIsMobile();
   const [text, setText] = useState("");
@@ -30,8 +24,8 @@ const CreatePost = () => {
   const [expandedPostId, setExpandedPostId] = useState<string | null>("main");
 
   return (
-    <div className={`flex ${isMobile ? 'flex-col' : 'gap-8'}`}>
-      <div className={`flex-1 bg-white rounded-lg shadow-sm border border-gray-200 ${isMobile ? 'mb-4' : ''}`}>
+    <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
+      <div className="flex-1 bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="p-4">
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-xl font-semibold text-gray-800">Create Post</h1>
@@ -40,11 +34,11 @@ const CreatePost = () => {
           {!isThreadMode ? (
             <>
               <PostTextArea value={text} onChange={setText} />
-              <div className="flex items-start gap-4">
-                <div className="flex-1">
+              <div className="flex flex-col sm:flex-row items-start gap-4">
+                <div className="flex-1 w-full">
                   <MediaUpload onUpload={(url) => setMedia([...media, url])} />
                   {media.length > 0 && (
-                    <div className="mt-4 grid grid-cols-2 gap-2">
+                    <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {media.map((url, index) => (
                         <img key={index} src={url} alt="" className="rounded-lg w-full h-48 object-cover" />
                       ))}
@@ -74,7 +68,7 @@ const CreatePost = () => {
                       setExpandedPostId(newPostId);
                     }
                   }}
-                  className="mt-2"
+                  className="mt-2 w-full sm:w-auto"
                 >
                   Start Thread
                 </Button>
@@ -96,7 +90,7 @@ const CreatePost = () => {
         </div>
       </div>
 
-      <div className={`${isMobile ? 'w-full' : 'w-[350px] self-start'} bg-white rounded-lg shadow-sm border border-gray-200 p-4 ${isMobile ? '' : 'sticky top-4'}`}>
+      <div className="lg:w-[350px] bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:sticky lg:top-4">
         <Dialog>
           <DialogTrigger asChild>
             <div className="cursor-pointer">
@@ -107,7 +101,7 @@ const CreatePost = () => {
               />
             </div>
           </DialogTrigger>
-          <DialogContent className={`${isMobile ? 'w-[95vw] max-w-[95vw]' : 'sm:max-w-[425px]'} max-h-[90vh]`}>
+          <DialogContent className="w-[95vw] max-w-[95vw] lg:w-[425px] lg:max-w-[425px] max-h-[90vh]">
             <PostPreview 
               text={isThreadMode ? threadPosts[0]?.text : text} 
               media={isThreadMode ? threadPosts[0]?.media : media}
