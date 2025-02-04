@@ -34,7 +34,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
             </Button>
           </header>
           <main className="flex-1">
-            <div className="h-full px-4 py-6 lg:px-8">
+            <div className="h-full w-full px-4 py-6 lg:px-8">
               {children}
             </div>
           </main>
