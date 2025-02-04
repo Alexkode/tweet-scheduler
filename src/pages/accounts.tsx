@@ -24,7 +24,7 @@ const AccountsPage = () => {
 
   return (
     <MainLayout>
-      <Card className="p-6">
+      <Card className="p-6 max-w-md mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-semibold">Connected Accounts</h1>
         </div>
@@ -47,7 +47,7 @@ const AccountsPage = () => {
                 ) : (
                   <Button 
                     variant="secondary" 
-                    className="w-full bg-slate-800 text-white hover:bg-slate-700"
+                    className="w-[200px] bg-slate-800 text-white hover:bg-slate-700"
                   >
                     Connect {platform.name}
                   </Button>
