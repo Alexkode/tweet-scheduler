@@ -1,6 +1,6 @@
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
-import { Twitter, Instagram, Youtube, Tiktok, Facebook, Linkedin, AtSign, Github, Pinterest } from "lucide-react";
+import { Twitter, Instagram, Youtube, Facebook, Linkedin, AtSign, Github } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { X, Filter } from "lucide-react";
 
@@ -9,12 +9,10 @@ const AccountsPage = () => {
     { name: "Twitter", icon: Twitter, username: "AlexRougea" },
     { name: "Instagram", icon: Instagram },
     { name: "Youtube", icon: Youtube },
-    { name: "Tiktok", icon: Tiktok },
     { name: "Facebook", icon: Facebook },
     { name: "Linkedin", icon: Linkedin },
     { name: "Bluesky", icon: Github },
     { name: "Threads", icon: AtSign },
-    { name: "Pinterest", icon: Pinterest },
   ];
 
   return (
