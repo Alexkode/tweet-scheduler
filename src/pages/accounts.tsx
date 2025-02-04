@@ -1,6 +1,6 @@
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
-import { Twitter, Instagram, Youtube, Facebook, Linkedin, AtSign, Share2, Link2 } from "lucide-react";
+import { Twitter, Instagram, Youtube, Facebook, Linkedin, AtSign, Share2, Link2, X } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 const AccountsPage = () => {
