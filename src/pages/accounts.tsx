@@ -1,8 +1,7 @@
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
-import { Twitter, Instagram, Youtube, Facebook, Linkedin, AtSign, Github } from "lucide-react";
+import { Twitter, Instagram, Youtube, Facebook, Linkedin, AtSign, Share2, Link2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { X, Filter } from "lucide-react";
 
 const AccountsPage = () => {
   const socialPlatforms = [
@@ -11,8 +10,9 @@ const AccountsPage = () => {
     { name: "Youtube", icon: Youtube },
     { name: "Facebook", icon: Facebook },
     { name: "Linkedin", icon: Linkedin },
-    { name: "Bluesky", icon: Github },
-    { name: "Threads", icon: AtSign },
+    { name: "TikTok", icon: Share2 },
+    { name: "Pinterest", icon: Link2 },
+    { name: "Bluesky", icon: AtSign },
   ];
 
   return (
@@ -20,10 +20,6 @@ const AccountsPage = () => {
       <Card className="p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-semibold">Connected Accounts</h1>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>all accounts</span>
-            <Filter className="w-4 h-4" />
-          </div>
         </div>
 
         <div className="space-y-4">
@@ -32,7 +28,7 @@ const AccountsPage = () => {
               <platform.icon className="w-6 h-6 text-muted-foreground" />
               <Button 
                 variant="secondary" 
-                className="bg-slate-800 text-white hover:bg-slate-700"
+                className="bg-slate-800 text-white hover:bg-slate-700 w-[300px]"
               >
                 Connect {platform.name}
               </Button>
@@ -44,12 +40,6 @@ const AccountsPage = () => {
               )}
             </div>
           ))}
-        </div>
-
-        <div className="mt-8">
-          <Button variant="outline" className="text-sm">
-            Refresh Twitter
-          </Button>
         </div>
       </Card>
     </MainLayout>
