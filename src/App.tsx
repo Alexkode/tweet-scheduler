@@ -11,6 +11,8 @@ import AccountsPage from "./pages/accounts";
 import NewPostPage from "./pages/new-post";
 import ScheduledPage from "./pages/scheduled";
 import SettingsPage from "./pages/settings";
+import BillingPage from "./pages/settings/billing";
+import NotificationsPage from "./pages/settings/notifications";
 import AuthPage from "./pages/auth";
 
 const queryClient = new QueryClient();
@@ -76,6 +78,22 @@ const App = () => (
                 element={
                   <PrivateRoute>
                     <SettingsPage />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/settings/billing"
+                element={
+                  <PrivateRoute>
+                    <BillingPage />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/settings/notifications"
+                element={
+                  <PrivateRoute>
+                    <NotificationsPage />
                   </PrivateRoute>
                 }
               />
