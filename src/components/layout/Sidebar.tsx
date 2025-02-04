@@ -1,5 +1,5 @@
 import { 
-  Home, Plus, Clock, Users, Settings, Sun, Moon, 
+  Home, Plus, Clock, Users, Settings, 
   CreditCard, Bell, LogOut, ChevronUp, ChevronDown 
 } from "lucide-react";
 import {
@@ -13,8 +13,6 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { useTheme } from "@/hooks/use-theme";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -39,7 +37,6 @@ const settingsMenuItems = [
 
 const Sidebar = () => {
   const navigate = useNavigate();
-  const { theme, setTheme } = useTheme();
   const { user, signOut } = useAuth();
 
   const userEmail = user?.email || '';
@@ -70,27 +67,18 @@ const Sidebar = () => {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="p-4 border-t">
-        <div className="flex items-center justify-between">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          >
-            {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-          </Button>
+        <div className="flex items-center justify-center">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-auto p-2 hover:bg-accent">
-                <div className="flex items-center gap-2">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src="" />
-                    <AvatarFallback>{userInitials}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col items-start text-sm">
-                    <span className="font-medium">{userEmail}</span>
-                  </div>
+              <button className="flex items-center gap-2 p-2 rounded-lg hover:bg-accent transition-colors">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src="" />
+                  <AvatarFallback>{userInitials}</AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col items-start text-sm">
+                  <span className="font-medium">{userEmail}</span>
                 </div>
-              </Button>
+              </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               {settingsMenuItems.map((item) => (
