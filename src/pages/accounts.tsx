@@ -9,7 +9,7 @@ const AccountsPage = () => {
     { name: "Twitter", icon: Twitter, username: "AlexRougea" },
     { name: "Instagram", icon: Instagram },
     { name: "Youtube", icon: Youtube },
-    { name: "TikTok", icon: Share2 },
+    { name: "Tiktok", icon: Share2 },
     { name: "Facebook", icon: Facebook },
     { name: "Linkedin", icon: Linkedin },
     { name: "Bluesky", icon: Github },
@@ -24,22 +24,22 @@ const AccountsPage = () => {
 
   return (
     <MainLayout>
-      <Card className="p-6 max-w-md mx-auto">
-        <div className="flex justify-between items-center mb-6">
+      <Card className="p-6 max-w-[600px] mx-auto">
+        <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-semibold">Connected Accounts</h1>
         </div>
 
         <div className="space-y-4">
           {socialPlatforms.map((platform) => (
             <div key={platform.name} className="flex items-center gap-4">
-              <platform.icon className="w-6 h-6 text-muted-foreground shrink-0" />
+              <platform.icon className="w-6 h-6 text-slate-700 shrink-0" />
               <div className="flex-1">
                 {platform.username ? (
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 bg-slate-100 px-3 py-1 rounded-full">
-                      <span>{platform.username}</span>
+                    <div className="flex items-center gap-2 bg-slate-100 rounded-md px-4 py-2 w-[200px]">
+                      <span className="text-slate-700">{platform.username}</span>
                       <X 
-                        className="w-4 h-4 text-muted-foreground cursor-pointer hover:text-red-500 transition-colors" 
+                        className="w-4 h-4 text-slate-500 cursor-pointer hover:text-red-500 transition-colors ml-auto" 
                         onClick={() => handleDisconnect(platform.name)}
                       />
                     </div>
@@ -47,7 +47,7 @@ const AccountsPage = () => {
                 ) : (
                   <Button 
                     variant="secondary" 
-                    className="w-[200px] bg-slate-800 text-white hover:bg-slate-700"
+                    className="w-[200px] bg-[#374151] text-white hover:bg-slate-700"
                   >
                     Connect {platform.name}
                   </Button>
@@ -58,7 +58,10 @@ const AccountsPage = () => {
         </div>
 
         <div className="mt-8">
-          <Button variant="outline" className="text-sm">
+          <Button 
+            variant="outline" 
+            className="text-sm border-slate-300 text-slate-700 hover:bg-slate-50"
+          >
             Refresh Twitter
           </Button>
         </div>
