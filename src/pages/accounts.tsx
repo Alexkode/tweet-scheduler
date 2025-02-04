@@ -1,6 +1,6 @@
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
-import { Twitter, Instagram, Youtube, Facebook, Linkedin, AtSign, Github } from "lucide-react";
+import { Twitter, Instagram, Youtube, Facebook, Linkedin, Share2, Link2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { X, Filter } from "lucide-react";
 
@@ -11,13 +11,13 @@ const AccountsPage = () => {
     { name: "Youtube", icon: Youtube },
     { name: "Facebook", icon: Facebook },
     { name: "Linkedin", icon: Linkedin },
-    { name: "Bluesky", icon: Github },
-    { name: "Threads", icon: AtSign },
+    { name: "TikTok", icon: Share2 },
+    { name: "Pinterest", icon: Link2 },
   ];
 
   return (
     <MainLayout>
-      <Card className="p-6">
+      <Card className="p-6 max-w-[800px] mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-semibold">Connected Accounts</h1>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -32,7 +32,7 @@ const AccountsPage = () => {
               <platform.icon className="w-6 h-6 text-muted-foreground" />
               <Button 
                 variant="secondary" 
-                className="bg-slate-800 text-white hover:bg-slate-700"
+                className="bg-[#1d4ed8] text-white hover:bg-[#1e40af] w-[300px]"
               >
                 Connect {platform.name}
               </Button>
